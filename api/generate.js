@@ -2,7 +2,7 @@
 // Vercel 서버리스 함수 (Node.js 런타임)
 // GEMINI_API_KEY는 Vercel 프로젝트 환경변수에서 읽어옵니다. 코드에 절대 직접 쓰지 않습니다.
 
-const MODEL_NAME = "Gemini 3.1 Flash Lite";
+const MODEL_NAME = "gemini-3.1-flash-lite";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent`;
 
 module.exports = async function handler(req, res) {
