@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>선택을 도와줘 🤔</title>
+<style>
+  :root {
+    --navy: #1A3A5C;
+    --teal: #0D8A7A;
+    --bg: #F5F7FA;
+    --card: #FFFFFF;
+    --text: #1F2937;
+    --muted: #6B7280;
+    --border: #E5E7EB;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Pretendard", "Apple SD Gothic Neo", "맑은 고딕", sans-serif;
+    background: linear-gradient(180deg, var(--bg) 0%, #EAF1F5 100%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+  .wrap {
+    width: 100%;
+    max-width: 480px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 26px;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(26, 58, 92, 0.08);
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .choice-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .choice-row input[type="text"] {
+    flex: 1;
+  }
+  .vs {
+    text-align: center;
+    color: var(--teal);
+    font-weight: 700;
+    font-size: 13px;
+    margin: -4px 0 14px;
+    letter-spacing: 1px;
+  }
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type="text"]:focus, textarea:focus {
+    border-color: var(--teal);
+  }
+  .emotion-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .emotion-chip {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s;
+  }
+  .emotion-chip.selected {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #fff;
+  }
+  textarea#emotionDetail {
+    min-height: 60px;
+    resize: vertical;
+    font-size: 14px;
+  }
+  button#askBtn {
+    width: 100%;
+    padding: 14px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.15s, transform 0.1s;
+  }
+  button#askBtn:hover { background: #142c47; }
+  button#askBtn:active { transform: scale(0.98); }
+  button#askBtn:disabled {
+    background: #A3B3C2;
+    cursor: not-allowed;
+  }
+  .error {
+    color: #C0392B;
+    font-size: 13px;
+    margin-top: 10px;
+    display: none;
+  }
+  .result {
+    display: none;
+  }
+  .result .picked {
+    background: linear-gradient(135deg, var(--teal), #0aa693);
+    color: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .picked .label {
+    font-size: 12px;
+    opacity: 0.85;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  .picked .value {
+    font-size: 22px;
+    font-weight: 800;
+  }
+  .result .block {
+    margin-bottom: 16px;
+  }
+  .result .block .heading {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .result .block .content {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .result .message-box {
+    background: #FBF9F1;
+    border-left: 4px solid #E0B23A;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-style: italic;
+    color: #574A20;
+  }
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 30px 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--teal);
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .reset-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--navy);
+    border: 1.5px solid var(--navy);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>선택을 도와줘 🤔</h1>
+  <p class="subtitle">고민되는 두 가지 선택지를 알려주면 AI가 골라드려요</p>
+
+  <div class="card" id="formCard">
+    <label>선택지 입력</label>
+    <div class="choice-row">
+      <input type="text" id="choiceA" placeholder="예: 떡볶이 먹기" maxlength="60" />
+    </div>
+    <div class="vs">VS</div>
+    <div class="choice-row">
+      <input type="text" id="choiceB" placeholder="예: 마라탕 먹기" maxlength="60" />
+    </div>
+
+    <label>지금 기분은 어때요?</label>
+    <div class="emotion-group" id="emotionGroup">
+      <div class="emotion-chip" data-emotion="신남">😆 신남</div>
+      <div class="emotion-chip" data-emotion="피곤함">😴 피곤함</div>
+      <div class="emotion-chip" data-emotion="스트레스">😤 스트레스</div>
+      <div class="emotion-chip" data-emotion="설렘">😊 설렘</div>
+      <div class="emotion-chip" data-emotion="우울함">😔 우울함</div>
+      <div class="emotion-chip" data-emotion="평온함">😌 평온함</div>
+    </div>
+    <textarea id="emotionDetail" placeholder="(선택) 지금 상황이나 기분을 조금 더 자세히 적어줘도 좋아요"></textarea>
+
+    <div class="error" id="errorMsg"></div>
+    <button id="askBtn">AI에게 물어보기 ✨</button>
+  </div>
+
+  <div class="loading" id="loadingBox">
+    <div class="spinner"></div>
+    AI가 고민하고 있어요...
+  </div>
+
+  <div class="card result" id="resultCard">
+    <div class="picked">
+      <div class="label">AI의 선택</div>
+      <div class="value" id="pickedValue"></div>
+    </div>
+    <div class="block">
+      <div class="heading">이렇게 고른 이유</div>
+      <div class="content" id="reasonText"></div>
+    </div>
+    <div class="block">
+      <div class="heading">지금 당신에게 한마디</div>
+      <div class="message-box" id="messageText"></div>
+    </div>
+    <button class="reset-btn" id="resetBtn">다시 선택하기</button>
+  </div>
+</div>
+
+<script>
+  const choiceAInput = document.getElementById('choiceA');
+  const choiceBInput = document.getElementById('choiceB');
+  const emotionGroup = document.getElementById('emotionGroup');
+  const emotionDetail = document.getElementById('emotionDetail');
+  const askBtn = document.getElementById('askBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const formCard = document.getElementById('formCard');
+  const loadingBox = document.getElementById('loadingBox');
+  const resultCard = document.getElementById('resultCard');
+  const resetBtn = document.getElementById('resetBtn');
+
+  let selectedEmotion = null;
+
+  emotionGroup.addEventListener('click', (e) => {
+    const chip = e.target.closest('.emotion-chip');
+    if (!chip) return;
+    document.querySelectorAll('.emotion-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    selectedEmotion = chip.dataset.emotion;
+  });
+
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.style.display = 'block';
+  }
+
+  function clearError() {
+    errorMsg.style.display = 'none';
+    errorMsg.textContent = '';
+  }
+
+  askBtn.addEventListener('click', async () => {
+    clearError();
+    const choiceA = choiceAInput.value.trim();
+    const choiceB = choiceBInput.value.trim();
+    const detail = emotionDetail.value.trim();
+
+    if (!choiceA || !choiceB) {
+      showError('두 가지 선택지를 모두 입력해주세요.');
+      return;
+    }
+    if (!selectedEmotion && !detail) {
+      showError('지금 기분을 하나 선택하거나 간단히 적어주세요.');
+      return;
+    }
+
+    askBtn.disabled = true;
+    formCard.style.display = 'none';
+    resultCard.style.display = 'none';
+    loadingBox.style.display = 'block';
+
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          choiceA,
+          choiceB,
+          emotion: selectedEmotion || '',
+          emotionDetail: detail
+        })
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `서버 오류 (${res.status})`);
+      }
+
+      const data = await res.json();
+
+      document.getElementById('pickedValue').textContent = data.pick;
+      document.getElementById('reasonText').textContent = data.reason;
+      document.getElementById('messageText').textContent = data.message;
+
+      loadingBox.style.display = 'none';
+      resultCard.style.display = 'block';
+    } catch (err) {
+      loadingBox.style.display = 'none';
+      formCard.style.display = 'block';
+      showError('오류가 발생했어요: ' + err.message);
+    } finally {
+      askBtn.disabled = false;
+    }
+  });
+
+  resetBtn.addEventListener('click', () => {
+    choiceAInput.value = '';
+    choiceBInput.value = '';
+    emotionDetail.value = '';
+    selectedEmotion = null;
+    document.querySelectorAll('.emotion-chip').forEach(c => c.classList.remove('selected'));
+    clearError();
+    resultCard.style.display = 'none';
+    formCard.style.display = 'block';
+  });
+</script>
+</body>
+</html>
